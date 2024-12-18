@@ -82,8 +82,13 @@ def remove_watermark(input_path, output_path=None):
     return output_path
 
 if __name__ == "__main__":
-    INPUT_PATH = r"D:\chiamjoonwee\Desktop\Julius Bar_3STATE_Nov 23.pdf"
+    # INPUT_PATH = r"D:\chiamjoonwee\Desktop\Julius Bar_3STATE_Nov 23.pdf"
     # INPUT_PATH = r"D:\chiamjoonwee\Desktop\SCB_3STV_Nov 23.pdf"
-
+    # INPUT_PATH = r"D:\chiamjoonwee\Desktop\SOA SCB Dec 23 scanned.pdf"
+    # INPUT_PATH = r"D:\chiamjoonwee\Desktop\UBS Apr 2023 1.pdf"
+    # Scanned pdf can remove watermark also...?
+    # standard chart not work but this one below can??
+    INPUT_PATH = r"D:\chiamjoonwee\Desktop\text protected pdf\3S Nov ME Statement text protected.pdf"
+    # INPUT_PATH = r"D:\chiamjoonwee\Desktop\3S Dec ME SOA ubs.pdf"
     # INPUT_PATH = r"P:\YEAR 2024\TECHNOLOGY\Technology users\FS\FS Funds\UAT\23973\Input\Custodian confirmation\SCB SOA Dec 2023.pdf"
     remove_watermark(INPUT_PATH)

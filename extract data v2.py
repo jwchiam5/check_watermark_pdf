@@ -101,7 +101,7 @@ def extract_pages(pdf_path, start_page, max_pages,  desired_cols, pdf_cols):
 if __name__ == "__main__":
     # PDF_PATH = r"D:\chiamjoonwee\Desktop\Julius Bar_3STATE_Nov 23_nowatermark.pdf"
     # PDF_PATH = r"D:\chiamjoonwee\Desktop\3S June ME statement.pdf"
-    PDF_PATH = r"D:\chiamjoonwee\Desktop\Sample Data 1_restrictedcopy.pdf"
+    PDF_PATH = r"C:\Users\chiamjoonwee\Downloads\SOA SCB Dec 23 scanned.pdf"
     START_PAGE = 1  # Start from page number 5
     MAX_PAGES = 10    # Process up to 2 pages
     DESIRED_COLS = [

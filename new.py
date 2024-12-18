@@ -1,10 +1,48 @@
 import fitz
 import re
 import logging
+from PyPDF2 import PdfReader
 
 # Set up logging
 logging.basicConfig(level=logging.INFO,
                    format='%(message)s')
+
+
+def is_copy_protected(pdf_path: str) -> bool:
+    """
+    Check if a PDF is copy-protected (i.e., text cannot be copied).
+    Position:       3210 (rightmost bits)
+    Actual bits:  ...1100
+    Meaning:
+    - Bit 4 (0b10000): Extract text = 1 (allowed)
+    - Bit 3 (0b01000): Modify = 0 (not allowed)
+    - Bit 2 (0b00100): Print = 0 (not allowed)
+    """
+    EXTRACT_PERMISSION_BIT = 0b10000  # Bit 4
+
+    reader = PdfReader(pdf_path)
+    print(f"\nAnalyzing PDF: {pdf_path}")
+    print(f"Is encrypted: {reader.is_encrypted}")
+
+
+     # After decryption attempt, check if still encrypted
+    if reader.is_encrypted:
+        # Get encryption dictionary from PDF trailer
+        # This contains all security/permission settings
+        encryption_dict = reader.trailer['/Encrypt']
+
+        # Get permissions integer from encryption dict
+        # /P entry contains 32-bit permissions flag
+        permissions = encryption_dict.get('/P', None)
+
+        # Check if extract permission bit (bit 4) is set
+        # permissions & 0b10000 does bitwise AND to check bit 4
+        # != 0 means the bit is set (permission granted)
+        if permissions is not None:
+            has_extract_permission = (permissions & EXTRACT_PERMISSION_BIT) != 0
+            print(f"Extract permission is {'granted' if has_extract_permission else 'not granted'}")
+            return not has_extract_permission
+    return False
 
 # CHECK IF PDF IS SCANNED OR NOT
 def is_scanned_pdf(page) -> bool:
@@ -23,7 +61,7 @@ def is_scanned_pdf(page) -> bool:
     # Analyze images
     image_list = page.get_images()
     image_coverage = 0
-    # image_area = 0
+    image_area = 0
     # img_width = 0
     # img_height = 0
 
@@ -88,17 +126,21 @@ def process_text_page(page, header):
     return text
 
 def process_pdf(input_path, header):
-    # Open the PDF
-    doc = fitz.open(input_path)
+    if is_copy_protected(input_path):
+        logging.info(f"The PDF '{input_path}' is copy-protected and cannot be processed.")
+        return
 
-    for page_num in range(len(doc)):
-        page = doc.load_page(page_num)
-        if is_scanned_pdf(page):
-            process_scanned_page(page,header=header)
-        else:
-            process_text_page(page,header=header)
+    # # Open the PDF
+    # doc = fitz.open(input_path)
 
-    doc.close()
+    # for page_num in range(len(doc)):
+    #     page = doc.load_page(page_num)
+    #     if is_scanned_pdf(page):
+    #         process_scanned_page(page,header=header)
+    #     else:
+    #         process_text_page(page,header=header)
+
+    # doc.close()
 
 
 
@@ -150,9 +192,15 @@ def analyze_pdf(pdf_path: str):
 
 if __name__ == "__main__":
     # this the one i have to do
-    # PDF_PATH = r"D:\chiamjoonwee\Desktop\Julius Bar_3STATE_Nov 23.pdf"
+    PDF_PATH = r"D:\chiamjoonwee\Desktop\Julius Bar_3STATE_Nov 23.pdf"
+    # PDF THAT IS PROTECTED
+    # PDF_PATH = r"D:\chiamjoonwee\Desktop\Sample Data 1_restrictedcopy.pdf"
+
     # this the other pdf i can test with
     # PDF_PATH = r"D:\chiamjoonwee\Desktop\SCB_3STV_Nov 23.pdf"
+
     # scanned pdf test
-    PDF_PATH = r"D:\chiamjoonwee\Desktop\SOA SCB Dec 23.pdf"
-    analyze_pdf(PDF_PATH)
+    # PDF_PATH = r"D:\chiamjoonwee\Desktop\SOA SCB Dec 23.pdf"
+    # analyze_pdf(PDF_PATH)
+    HEADER = "Your Header Information"
+    process_pdf(PDF_PATH, HEADER)
